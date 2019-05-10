@@ -1,0 +1,13 @@
+#service:
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:6.3.2
+    volumes:
+      - /opt/someone/dockerfiles/prod/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/log/someone/prod:/mnt/log:ro
+      - /opt/someone/dockerfiles/prod/filebeat/someoneio.crt:/usr/share/filebeat/certs/someoneio.crt
+      - /opt/someone/dockerfiles/prod/filebeat/someoneio.key:/usr/share/filebeat/certs/someoneio.key
+#networks:
+#  stack-docker-master_stack:
+#    external: true
+
+

@@ -1,0 +1,43 @@
+filebeat.prospectors:
+- paths:
+    - /mnt/log/*.json
+  input_type: log
+  json.key_under_root: true
+  json.add_error_key: true
+
+processors:
+- rename:
+    fields:
+       - from: "json.gameid"
+         to: "gameid"
+#    process_array: false
+#    max_depth: 1
+#    target: ""
+#    overwrite_keys: false
+
+output.elasticsearch:
+  hosts: ["elastics.someone.io:8082"]
+  indices:
+    - index: "prodinfo-%{[beat.version]}"
+  #    when.contains:
+  #      message: "INFO"
+  #  - index: "debug-%{[beat.version]}"
+  #    when.contains:
+  #      message: "DEBUG"
+  protocol: "https"
+  username: "someone"
+  # Read PW from filebeat.keystore
+  password: "someonetrial"
+  ssl.certificate: "/usr/share/filebeat/certs/someoneio.crt"
+  ssl.key: "/usr/share/filebeat/certs/someoneio.key"
+
+setup.kibana:
+  host: "xx.xx.xx.x:5601"
+  username: "someone"
+  password: "someonetrial"
+  protocol: "https"
+  ssl.enabled: true
+  ssl.certificate: "/usr/share/filebeat/certs/someoneio.crt"
+  ssl.key: "/usr/share/filebeat/certs/someoneio.key"
+  #ssl.certificate_authorities: ["/usr/share/filebeat/certs/ca/ca.crt"]
+

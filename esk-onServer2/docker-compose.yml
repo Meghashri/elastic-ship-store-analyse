@@ -1,0 +1,63 @@
+---
+version: '3.6'
+services:
+  # The environment variable "TAG" is used throughout this file to
+  # specify the version of the images to run. The default is set in the
+  # '.env' file in this folder. It can be overridden with any normal
+  # technique for setting environment variables, for example:
+  #
+  #   TAG=6.0.0-beta1 docker-compose up
+  #
+  # REF: https://docs.docker.com/compose/compose-file/#variable-substitution
+  #
+  # Also be sure to set the ELASTIC_VERSION variable. For released versions,
+  # ${TAG} and ${ELASTIC_VERSION} will be identical, but for pre-release
+  # versions, ${TAG} might contain an extra build identifier, like
+  # "6.0.0-beta1-3eab5b40", so a full invocation might look like:
+  #
+  #   ELASTIC_VERSION=6.0.0-beta1 TAG=6.0.0-beta1-3eab5b40 docker-compose up
+  #
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.3.0
+    container_name: elasticsearch
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    #ports: ['9200:9200']   --> Security:Commented out to hide the ports so external networks cant reach
+    networks: ['stack']
+    volumes:
+      - '/opt/someone/dockerfiles/es-kibana/config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
+      - 'es_data:/usr/share/elasticsearch/data'
+      - '/opt/someone/es-backup:/usr/share/elasticsearch/data/backup:rw'
+      - '/etc/apache2/ssl/someoneio.crt:/usr/share/elasticsearch/config/certs/someoneio.crt'
+      - '/etc/apache2/ssl/someoneio.key:/usr/share/elasticsearch/config/certs/someoneio.key'
+
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.3.0
+    container_name: kibana
+    #ports: ['5601:5601']   --> Security:Commented out to hide the ports so external networks cant reach
+    networks: ['stack']
+    depends_on: ['elasticsearch']
+    restart: unless-stopped
+    volumes:
+      - './config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml'
+      - '/opt/someone/dockerfiles/es_kibana/config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml'
+      - '/etc/apache2/ssl/someoneio.crt:/usr/share/kibana/config/certs/kibana/someoneio.crt'
+      - '/etc/apache2/ssl/someoneio.key:/usr/share/kibana/config/certs/kibana/someoneio.key'
+
+
+  webserver: 
+    build: config/webserver
+    ports: ['8080:80']
+    restart: unless-stopped
+    #volumes: 
+    #  - "./static/:/var/www/static:ro"
+    #  - "./logs:/var/log/apache2"
+    networks: ['stack']
+
+
+networks: {stack: {}}
+# use docker volume to persist ES data outside of a container.
+volumes:
+  es_data:

@@ -12,7 +12,8 @@ FILEBEAT
 #### prod
 
 Filebeat container runs on each of our application servers .
-filebeat is continously monitoring the log location . Whenever there is a new results-*.json available(on daily basis) , it ships it to elasticsearch.
+filebeat is continously monitoring the log location . 
+Whenever there is a new results-*.json available(on daily basis), it ships it to elasticsearch.
 
 #### Setup
 
@@ -33,24 +34,26 @@ parsed log location:
 ELASTICSEARCH
 -------------
 
-Runs on container in server2.
+Runs on container in server2 :9200.
 Saves the data received from filebeat into index -prodinfo-6.3.2
 
-The data in the index can be used to set up dashboards on kibana
-9200 port not exposed outside, so without access to kibana not possible to run queries on elastic search
+The data in the index can be used to set up dashboards on kibana for analysis and visualizations.
+9200 port not exposed outside, so without access to kibana its not possible to run queries on elasticsearch
 
 KIBANA
 ------
 
-Runs on container in Server2
-`kibana.someone.io:8080` . 
+Runs on container in Server2:5601
+`kibana.someone.io:8080` from public internet. 
 
 Webserver
 ----------
 
-webserver container on Server2 hides kibana and elasticsearch by reverse proxy . this is to secure Kibana and lasticsearch from public access
-Elasticsearch has its own security package called XPACK that will handle aaccess control but its a licensed package .
-So if you want to implement access control then best way is to use webserver for reverse proxy and SSL certificates to encrypt the communication.
+Webserver container on Server2 hides kibana and elasticsearch by reverse proxy. 
+This is to secure Kibana and elasticsearch from public access.
+Elasticsearch has its own security package called XPACK that will handle access control but its a licensed package.
+So if you want to implement access control for no-charge then best way is to use webserver for reverse proxy 
+and SSL certificates to encrypt the communication.
 
 Access/signin controlled by username and password.
 
